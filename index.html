@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agrivitro Box — Interface IoT Serre</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh;overflow-x:hidden}
+
+/* TOP BAR */
+.topbar{background:#1a3a1a;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-logo{width:32px;height:32px;background:#1D9E75;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.topbar-title{font-size:15px;font-weight:700;letter-spacing:.03em;color:#fff}
+.topbar-sub{font-size:11px;color:#7fbf7f;margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:14px;font-size:12px;color:#aaa}
+.status-dot{width:9px;height:9px;border-radius:50%;background:#555;display:inline-block;margin-right:4px;transition:background .4s}
+.status-dot.on{background:#1D9E75;box-shadow:0 0 6px #1D9E75}
+.status-dot.err{background:#E24B4A}
+.rfbtn{background:#2a5a2a;color:#aaffaa;border:1px solid #3a7a3a;border-radius:5px;padding:4px 10px;cursor:pointer;font-size:12px}
+.rfbtn:hover{background:#3a7a3a}
+.timestamp{color:#7fbf7f;font-size:11px}
+
+/* MAIN LAYOUT */
+.main{display:flex;gap:0;height:calc(100vh - 52px)}
+
+/* LEFT SIDEBAR */
+.sidebar{width:56px;background:#1a3a1a;display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:20px;flex-shrink:0}
+.sb-icon{width:38px;height:38px;background:#2a5a2a;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;color:#7fbf7f;font-size:20px}
+.sb-icon:hover,.sb-icon.act{background:#1D9E75;color:#fff}
+
+/* GREENHOUSE AREA */
+.gh-area{flex:1;padding:16px;display:flex;flex-direction:column;gap:0;overflow:auto}
+.area-title{color:#1a6a1a;font-size:13px;font-weight:800;letter-spacing:.12em;text-align:center;border:2px solid #2a8a2a;border-bottom:none;padding:6px 0;background:#d4e8d0;border-radius:6px 6px 0 0}
+.gh-grid{border:2px solid #2a8a2a;background:repeating-linear-gradient(45deg,#e8f0e4,#e8f0e4 8px,#ddebd8 8px,#ddebd8 16px);border-radius:0 0 6px 6px;padding:14px 10px;display:flex;flex-direction:column;gap:10px;flex:1}
+
+/* BANCALE */
+.bancale{background:linear-gradient(135deg,#f0a020,#e8881a);border-radius:8px;border:2px solid #c86000;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:relative;min-height:80px}
+.bancale-label{position:absolute;top:-11px;left:14px;background:#1a3a1a;color:#7fbf7f;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.06em}
+.sensor-group{display:flex;flex-direction:column;gap:6px}
+.sensor-row{display:flex;align-items:center;gap:6px}
+.s-icon{font-size:20px;line-height:1}
+.s-val{font-size:14px;font-weight:700;color:#1a1a00;background:rgba(255,255,255,0.35);padding:2px 7px;border-radius:4px;min-width:72px;text-align:center}
+.s-val.loading{color:#8a6000;font-size:11px}
+.lux-badge{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.25);border-radius:6px;padding:4px 8px}
+.lux-val{font-size:13px;font-weight:700;color:#1a1a00}
+.hum-gauge{display:flex;flex-direction:column;align-items:center;gap:3px}
+.gauge-circle{width:54px;height:54px;position:relative}
+.gauge-circle svg{width:54px;height:54px}
+.gauge-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:12px;font-weight:700;color:#1a1a00}
+
+/* RIGHT PANEL */
+.right-panel{width:220px;background:#d4e8d0;border-left:2px solid #2a8a2a;display:flex;flex-direction:column;flex-shrink:0}
+.panel-section{padding:12px}
+.panel-title{color:#1a6a1a;font-size:11px;font-weight:800;letter-spacing:.1em;text-align:center;border:2px solid #2a8a2a;padding:5px;background:#c4dcc0;border-radius:4px;margin-bottom:10px}
+.status-indicator{width:36px;height:36px;border-radius:50%;background:#8B2020;margin:0 auto 10px;border:3px solid #600;box-shadow:inset 0 2px 4px rgba(0,0,0,.3)}
+.status-indicator.on{background:#1D9E75;border-color:#0a5a3a;box-shadow:inset 0 2px 4px rgba(0,0,0,.3),0 0 10px #1D9E7580}
+
+.tech-table{width:100%;border-collapse:collapse}
+.tech-table td{font-size:11px;padding:3px 5px;border-bottom:1px solid #b8d4b4}
+.tech-table td:first-child{font-weight:700;color:#1a5a1a;white-space:nowrap}
+.tech-table td:last-child{text-align:right;font-weight:600;color:#1a3a1a;background:#e8f4e4;border-radius:3px;padding:2px 6px}
+.tech-table tr:last-child td{border-bottom:none}
+
+.divider{height:2px;background:#2a8a2a;margin:8px 0}
+
+/* ERROR */
+.err-overlay{position:fixed;bottom:16px;right:16px;background:#fff0f0;border:1px solid #fca5a5;border-radius:8px;padding:10px 14px;font-size:12px;color:#991b1b;display:none;max-width:300px;z-index:100}
+
+/* LOADING */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.pulsing{animation:pulse 1.2s ease infinite}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">🌱</div>
+    <div>
+      <div class="topbar-title">AGRIVITRO BOX</div>
+      <div class="topbar-sub">Interface IoT de Projet · Serre Connectée Fès</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span><span class="status-dot" id="dot"></span><span id="stxt">Connexion…</span></span>
+    <span class="timestamp" id="ts">--:--</span>
+    <button class="rfbtn" onclick="loadData()">↺ Rafraîchir</button>
+  </div>
+</div>
+
+<div class="main">
+  <!-- LEFT SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-icon act" title="Vue Plan">🗺️</div>
+    <div class="sb-icon" title="Météo">⛅</div>
+    <div class="sb-icon" title="Graphiques" onclick="window.open('https://thingspeak.com/channels/2570391','_blank')">📈</div>
+  </div>
+
+  <!-- GREENHOUSE -->
+  <div class="gh-area">
+    <div class="area-title">AGRIVITRO BOX — SERRE CONNECTÉE</div>
+    <div class="gh-grid" id="gh-grid">
+
+      <!-- BANCALE 1 — Serre Fès -->
+      <div class="bancale">
+        <span class="bancale-label">SERRE FÈS</span>
+        <div class="sensor-group">
+          <div class="sensor-row">
+            <span class="s-icon">🌡️</span>
+            <span class="s-val pulsing" id="f1">…°C</span>
+          </div>
+          <div class="sensor-row">
+            <span class="s-icon">🌱</span>
+            <span class="s-val pulsing" id="f3">…°C</span>
+          </div>
+        </div>
+
+        <div class="hum-gauge">
+          <svg viewBox="0 0 54 54" class="gauge-circle">
+            <circle cx="27" cy="27" r="22" fill="none" stroke="rgba(0,0,0,0.15)" stroke-width="5"/>
+            <circle cx="27" cy="27" r="22" fill="none" stroke="#1a3a1a" stroke-width="5"
+              stroke-dasharray="138.2" stroke-dashoffset="138.2"
+              id="g2" stroke-linecap="round" transform="rotate(-90 27 27)"/>
+          </svg>
+          <div style="position:absolute;font-size:11px;font-weight:700;color:#1a1a00" id="f2t">…%</div>
+          <div style="font-size:9px;color:#5a3000;margin-top:-2px">Humidité</div>
+        </div>
+
+        <div class="sensor-group">
+          <div class="sensor-row">
+            <span class="s-icon">💦</span>
+            <span class="s-val pulsing" id="f4">…%</span>
+          </div>
+          <div class="sensor-row">
+            <span class="s-icon">🌬️</span>
+            <span class="s-val pulsing" id="f6">… ppm</span>
+          </div>
+        </div>
+
+        <div class="lux-badge">
+          <span style="font-size:18px">☀️</span>
+          <div>
+            <div class="lux-val" id="f5">… lux</div>
+            <div style="font-size:9px;color:#5a3000">Luminosité</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLACEHOLDER BANCALES (autres boxes) -->
+      <div class="bancale" style="opacity:.5">
+        <span class="bancale-label">SOUSS-MASSA #1</span>
+        <div style="font-size:12px;color:#5a3000;width:100%;text-align:center;padding:8px">
+          📡 En attente de connexion…
+        </div>
+      </div>
+      <div class="bancale" style="opacity:.5">
+        <span class="bancale-label">SOUSS-MASSA #2</span>
+        <div style="font-size:12px;color:#5a3000;width:100%;text-align:center;padding:8px">
+          📡 En attente de connexion…
+        </div>
+      </div>
+      <div class="bancale" style="opacity:.5">
+        <span class="bancale-label">SOUSS-MASSA #3</span>
+        <div style="font-size:12px;color:#5a3000;width:100%;text-align:center;padding:8px">
+          📡 En attente de connexion…
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="panel-section">
+      <div class="status-indicator" id="status-circle"></div>
+      <div style="text-align:center;font-size:10px;color:#555;margin-bottom:8px" id="last-entry">Dernière entrée: --</div>
+      <div class="panel-title">RÉSUMÉ CAPTEURS</div>
+      <table class="tech-table">
+        <tr><td>Temp. Air</td><td id="r1">--</td></tr>
+        <tr><td>Humidité Air</td><td id="r2">--</td></tr>
+        <tr><td>Temp. Sol</td><td id="r3">--</td></tr>
+        <tr><td>Humidité Sol</td><td id="r4">--</td></tr>
+        <tr><td>Luminosité</td><td id="r5">--</td></tr>
+        <tr><td>Qualité Air</td><td id="r6">--</td></tr>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="panel-section">
+      <div class="panel-title">SPAZIO TECNICO</div>
+      <table class="tech-table">
+        <tr><td>Canal</td><td>#2570391</td></tr>
+        <tr><td>Accès</td><td>Public</td></tr>
+        <tr><td>Capteurs</td><td>6 actifs</td></tr>
+        <tr><td>Refresh</td><td>30s</td></tr>
+        <tr><td>Boxes</td><td>4 / 7</td></tr>
+      </table>
+    </div>
+
+    <div style="flex:1"></div>
+    <div style="padding:10px;text-align:center">
+      <div style="font-size:10px;color:#888;font-weight:700;letter-spacing:.06em">AGRIVITRO</div>
+      <div style="font-size:9px;color:#aaa">Cultivez Plus, Dépensez Moins</div>
+    </div>
+  </div>
+</div>
+
+<div class="err-overlay" id="err"></div>
+
+<script>
+const CH='2570391', KEY='0RISAQOSD2FDM49B';
+
+function v(id,txt){const e=document.getElementById(id);if(e){e.textContent=txt;e.classList.remove('pulsing');}}
+
+function setGauge(pct){
+  const circle=document.getElementById('g2');
+  const circumference=138.2;
+  const offset=circumference-(pct/100)*circumference;
+  circle.style.strokeDashoffset=offset;
+  const hue=pct>70?120:pct>40?60:0;
+  circle.style.stroke=`hsl(${hue},70%,30%)`;
+}
+
+async function loadData(){
+  document.getElementById('dot').className='status-dot';
+  document.getElementById('stxt').textContent='Connexion…';
+  try {
+    const [mRes,fRes]=await Promise.all([
+      fetch(`https://api.thingspeak.com/channels/${CH}.json?api_key=${KEY}`),
+      fetch(`https://api.thingspeak.com/channels/${CH}/feeds.json?api_key=${KEY}&results=1`)
+    ]);
+    if(!mRes.ok||!fRes.ok) throw new Error('HTTP '+mRes.status);
+    const fd=await fRes.json();
+    const last=fd.feeds&&fd.feeds[0];
+    if(!last) throw new Error('Aucune donnée');
+
+    const f1=parseFloat(last.field1), f2=parseFloat(last.field2),
+          f3=parseFloat(last.field3), f4=parseFloat(last.field4),
+          f5=parseFloat(last.field5), f6=parseFloat(last.field6);
+
+    // Main bancale
+    v('f1', isNaN(f1)?'--':f1.toFixed(1)+' °C');
+    v('f2t', isNaN(f2)?'--':f2.toFixed(1)+'%');
+    v('f3', isNaN(f3)?'--':f3.toFixed(1)+' °C');
+    v('f4', isNaN(f4)?'--':f4.toFixed(1)+' %');
+    v('f5', isNaN(f5)?'--':Math.round(f5)+' lux');
+    v('f6', isNaN(f6)?'--':Math.round(f6)+' ppm');
+    if(!isNaN(f2)) setGauge(f2);
+
+    // Right panel summary
+    v('r1', isNaN(f1)?'--':f1.toFixed(1)+' °C');
+    v('r2', isNaN(f2)?'--':f2.toFixed(1)+' %');
+    v('r3', isNaN(f3)?'--':f3.toFixed(1)+' °C');
+    v('r4', isNaN(f4)?'--':f4.toFixed(1)+' %');
+    v('r5', isNaN(f5)?'--':Math.round(f5)+' lux');
+    v('r6', isNaN(f6)?'--':Math.round(f6)+' ppm');
+
+    const ts=new Date(last.created_at);
+    const fmt=ts.toLocaleString('fr-MA',{timeZone:'Africa/Casablanca',hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'});
+    document.getElementById('last-entry').textContent='Dernière entrée: '+fmt;
+    document.getElementById('ts').textContent=new Date().toLocaleTimeString('fr-MA',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('dot').className='status-dot on';
+    document.getElementById('stxt').textContent='En ligne';
+    document.getElementById('status-circle').className='status-indicator on';
+    document.getElementById('err').style.display='none';
+
+  } catch(e){
+    document.getElementById('dot').className='status-dot err';
+    document.getElementById('stxt').textContent='Hors ligne';
+    document.getElementById('status-circle').className='status-indicator';
+    const err=document.getElementById('err');
+    err.style.display='block';
+    err.textContent='Erreur: '+e.message;
+  }
+}
+
+loadData();
+setInterval(loadData,30000);
+</script>
+</body>
+</html>
