@@ -8,8 +8,6 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh;overflow-x:hidden}
-
-/* TOP BAR */
 .topbar{background:#1a3a1a;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px;position:sticky;top:0;z-index:100}
 .topbar-left{display:flex;align-items:center;gap:12px}
 .topbar-logo{width:32px;height:32px;background:#1D9E75;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px}
@@ -21,46 +19,31 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
 .sdot.err{background:#E24B4A}
 .rfbtn{background:#2a5a2a;color:#aaffaa;border:1px solid #3a7a3a;border-radius:5px;padding:4px 12px;cursor:pointer;font-size:12px}
 .rfbtn:hover{background:#3a7a3a}
-
-/* TABS */
 .tabs{display:flex;background:#142814;border-bottom:2px solid #2a8a2a}
 .tab{padding:10px 24px;font-size:12px;font-weight:600;color:#7fbf7f;cursor:pointer;border-bottom:3px solid transparent;letter-spacing:.06em}
 .tab.act{color:#fff;border-bottom-color:#1D9E75;background:#1a3a1a}
 .tab:hover{color:#fff}
-
-/* VIEWS */
 .view{display:none;padding:14px}
 .view.act{display:block}
-
-/* GREENHOUSE PLAN */
 .area-title{color:#1a6a1a;font-size:13px;font-weight:800;letter-spacing:.12em;text-align:center;border:2px solid #2a8a2a;border-bottom:none;padding:6px 0;background:#d4e8d0;border-radius:6px 6px 0 0}
 .gh-grid{border:2px solid #2a8a2a;background:repeating-linear-gradient(45deg,#e8f0e4,#e8f0e4 8px,#ddebd8 8px,#ddebd8 16px);border-radius:0 0 6px 6px;padding:14px 10px;display:flex;gap:12px}
 .gh-left{flex:1;display:flex;flex-direction:column;gap:10px}
 .gh-right{width:200px;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
-
-/* BANCALE */
 .bancale{background:linear-gradient(135deg,#f0a020,#e8881a);border-radius:8px;border:2px solid #c86000;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:relative;min-height:90px}
 .bancale-label{position:absolute;top:-11px;left:14px;background:#1a3a1a;color:#7fbf7f;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.06em}
 .bancale.offline{opacity:.45;filter:grayscale(.5)}
-
 .sensor-group{display:flex;flex-direction:column;gap:7px}
 .s-row{display:flex;align-items:center;gap:7px}
 .s-icon{font-size:22px;line-height:1}
 .s-val{font-size:14px;font-weight:700;color:#1a1a00;background:rgba(255,255,255,0.38);padding:3px 8px;border-radius:5px;min-width:80px;text-align:center;transition:background .3s}
 .s-val.updated{background:rgba(29,158,117,0.4)}
-
-/* HUMIDITY GAUGE */
 .gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;position:relative}
 .gauge-wrap svg{width:60px;height:60px}
 .gauge-txt{position:absolute;top:18px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;color:#1a1a00;white-space:nowrap}
 .gauge-lbl{font-size:9px;color:#5a3000;margin-top:2px}
-
-/* LUX BADGE */
 .lux-badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.28);border-radius:7px;padding:6px 10px}
 .lux-val{font-size:14px;font-weight:700;color:#1a1a00}
 .lux-lbl{font-size:9px;color:#5a3000}
-
-/* RIGHT PANEL */
 .panel-box{background:#d4e8d0;border:2px solid #2a8a2a;border-radius:6px;padding:10px}
 .panel-title{color:#1a6a1a;font-size:10px;font-weight:800;letter-spacing:.1em;text-align:center;border:1px solid #2a8a2a;padding:4px;background:#c4dcc0;border-radius:4px;margin-bottom:8px}
 .status-circle{width:32px;height:32px;border-radius:50%;background:#8B2020;margin:0 auto 6px;border:3px solid #600;transition:background .4s,box-shadow .4s}
@@ -71,23 +54,16 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
 .tech-tbl td:last-child{text-align:right;font-weight:600;background:#e8f4e4;border-radius:3px;padding:2px 5px;color:#1a3a1a}
 .tech-tbl tr:last-child td{border-bottom:none}
 .last-ts{font-size:10px;color:#666;text-align:center;margin-bottom:6px}
-
-/* CHART VIEW */
 .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .chart-card{background:#fff;border-radius:10px;border:1px solid #c8e0c4;padding:16px}
 .chart-card.full{grid-column:1/-1}
 .chart-title{font-size:12px;font-weight:700;color:#1a5a1a;margin-bottom:12px;letter-spacing:.05em}
-
-/* LOADING */
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .pulsing{animation:pulse 1.2s infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spinner{width:16px;height:16px;border:2px solid #1D9E7440;border-top-color:#1D9E75;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
 <div class="topbar">
   <div class="topbar-left">
     <div class="topbar-logo">🌱</div>
@@ -103,33 +79,22 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
   </div>
 </div>
 
-<!-- TABS -->
 <div class="tabs">
   <div class="tab act" onclick="switchTab('plan',this)">🗺️ PLAN SERRE</div>
   <div class="tab" onclick="switchTab('charts',this)">📈 GRAPHIQUES</div>
   <div class="tab" onclick="switchTab('history',this)">📊 HISTORIQUE</div>
 </div>
 
-<!-- VIEW: PLAN -->
 <div class="view act" id="view-plan">
   <div class="area-title">AGRIVITRO BOX — SERRE CONNECTÉE FÈS</div>
   <div class="gh-grid">
     <div class="gh-left">
-
-      <!-- BANCALE FÈS (live) -->
       <div class="bancale" id="bancale-fes">
         <span class="bancale-label">SERRE FÈS</span>
         <div class="sensor-group">
-          <div class="s-row">
-            <span class="s-icon">🌡️</span>
-            <span class="s-val pulsing" id="v-temp">…°C</span>
-          </div>
-          <div class="s-row">
-            <span class="s-icon">🌱</span>
-            <span class="s-val pulsing" id="v-soil">…%</span>
-          </div>
+          <div class="s-row"><span class="s-icon">🌡️</span><span class="s-val pulsing" id="v-temp">…°C</span></div>
+          <div class="s-row"><span class="s-icon">🌱</span><span class="s-val pulsing" id="v-soil">…%</span></div>
         </div>
-
         <div class="gauge-wrap">
           <svg viewBox="0 0 60 60">
             <circle cx="30" cy="30" r="24" fill="none" stroke="rgba(0,0,0,0.15)" stroke-width="5"/>
@@ -140,18 +105,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
           <div class="gauge-txt" id="v-hum-gauge">…%</div>
           <div class="gauge-lbl">Humidité air</div>
         </div>
-
         <div class="sensor-group">
-          <div class="s-row">
-            <span class="s-icon">🌬️</span>
-            <span class="s-val pulsing" id="v-air">… ppm</span>
-          </div>
-          <div class="s-row">
-            <span class="s-icon">💧</span>
-            <span class="s-val pulsing" id="v-hum">…%</span>
-          </div>
+          <div class="s-row"><span class="s-icon">🌬️</span><span class="s-val pulsing" id="v-air">… ppm</span></div>
+          <div class="s-row"><span class="s-icon">💧</span><span class="s-val pulsing" id="v-hum">…%</span></div>
         </div>
-
         <div class="lux-badge">
           <span style="font-size:22px">☀️</span>
           <div>
@@ -160,8 +117,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
           </div>
         </div>
       </div>
-
-      <!-- AUTRES BOXES (offline) -->
       <div class="bancale offline">
         <span class="bancale-label">SOUSS-MASSA #1</span>
         <div style="width:100%;text-align:center;font-size:12px;color:#5a3000">📡 En attente de connexion…</div>
@@ -174,10 +129,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
         <span class="bancale-label">SOUSS-MASSA #3</span>
         <div style="width:100%;text-align:center;font-size:12px;color:#5a3000">📡 En attente de connexion…</div>
       </div>
-
     </div>
-
-    <!-- RIGHT PANEL -->
     <div class="gh-right">
       <div class="panel-box">
         <div class="status-circle" id="status-circle"></div>
@@ -210,50 +162,45 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
   </div>
 </div>
 
-<!-- VIEW: CHARTS -->
 <div class="view" id="view-charts">
   <div class="chart-grid">
     <div class="chart-card full">
       <div class="chart-title">🌡️ TEMPÉRATURE AIR — Dernière heure</div>
-      <div style="position:relative;height:220px"><canvas id="chart-temp" role="img" aria-label="Température air historique"></canvas></div>
+      <div style="position:relative;height:220px"><canvas id="chart-temp" role="img" aria-label="Température"></canvas></div>
     </div>
     <div class="chart-card">
       <div class="chart-title">💧 HUMIDITÉ AIR</div>
-      <div style="position:relative;height:200px"><canvas id="chart-hum" role="img" aria-label="Humidité air historique"></canvas></div>
+      <div style="position:relative;height:200px"><canvas id="chart-hum" role="img" aria-label="Humidité"></canvas></div>
     </div>
     <div class="chart-card">
       <div class="chart-title">🌬️ QUALITÉ AIR (PPM)</div>
-      <div style="position:relative;height:200px"><canvas id="chart-air" role="img" aria-label="Qualité air historique"></canvas></div>
+      <div style="position:relative;height:200px"><canvas id="chart-air" role="img" aria-label="Air"></canvas></div>
     </div>
     <div class="chart-card">
       <div class="chart-title">🌱 HUMIDITÉ SOL</div>
-      <div style="position:relative;height:200px"><canvas id="chart-soil" role="img" aria-label="Sol historique"></canvas></div>
+      <div style="position:relative;height:200px"><canvas id="chart-soil" role="img" aria-label="Sol"></canvas></div>
     </div>
     <div class="chart-card">
       <div class="chart-title">☀️ LUMINOSITÉ</div>
-      <div style="position:relative;height:200px"><canvas id="chart-lux" role="img" aria-label="Luminosité historique"></canvas></div>
+      <div style="position:relative;height:200px"><canvas id="chart-lux" role="img" aria-label="Lux"></canvas></div>
     </div>
   </div>
 </div>
 
-<!-- VIEW: HISTORY -->
 <div class="view" id="view-history">
   <div class="chart-card" style="background:#fff;border-radius:10px;border:1px solid #c8e0c4;padding:16px">
-    <div class="chart-title">📊 TOUTES LES MESURES — Vue combinée (dernière heure)</div>
-    <div style="position:relative;height:380px"><canvas id="chart-all" role="img" aria-label="Toutes mesures historique"></canvas></div>
+    <div class="chart-title">📊 TOUTES LES MESURES — Vue combinée dernière heure</div>
+    <div style="position:relative;height:380px"><canvas id="chart-all" role="img" aria-label="Historique"></canvas></div>
   </div>
 </div>
 
 <script>
-// ─── CONFIG ──────────────────────────────────────────────
 const INFLUX_URL   = 'https://us-east-1-1.aws.cloud2.influxdata.com';
 const INFLUX_TOKEN = '2-qw3pUFmgsWIUFEu5qd02PoGszAK-dz8qrzrESvrQ6QFrtsBbkcfcCY5wAZXyblCkYszFzQB9jV2XfQhZf-PA==';
 const INFLUX_ORG   = 'c24b7db57e26733b';
 const BUCKET       = 'agrivitro-serre';
-
 let charts = {};
 
-// ─── TABS ────────────────────────────────────────────────
 function switchTab(name, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('act'));
   document.querySelectorAll('.view').forEach(v => v.classList.remove('act'));
@@ -262,8 +209,7 @@ function switchTab(name, el) {
   if (name === 'charts' || name === 'history') loadCharts();
 }
 
-// ─── INFLUXDB QUERY ──────────────────────────────────────
-async function influxQuery(sql) {
+async function influxQuery(flux) {
   const url = `${INFLUX_URL}/api/v2/query?orgID=${INFLUX_ORG}`;
   const resp = await fetch(url, {
     method: 'POST',
@@ -272,13 +218,12 @@ async function influxQuery(sql) {
       'Content-Type': 'application/vnd.flux',
       'Accept': 'application/csv'
     },
-    body: sql
+    body: flux
   });
   if (!resp.ok) throw new Error('HTTP ' + resp.status);
   return await resp.text();
 }
 
-// ─── PARSE CSV ───────────────────────────────────────────
 function parseCSV(csv) {
   const lines = csv.trim().split('\n').filter(l => l && !l.startsWith('#'));
   if (lines.length < 2) return [];
@@ -291,7 +236,6 @@ function parseCSV(csv) {
   });
 }
 
-// ─── UPDATE VALUE ────────────────────────────────────────
 function setVal(id, txt) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -301,7 +245,6 @@ function setVal(id, txt) {
   setTimeout(() => el.classList.remove('updated'), 1000);
 }
 
-// ─── GAUGE ───────────────────────────────────────────────
 function setGauge(pct) {
   const c = document.getElementById('gauge-circle');
   if (!c) return;
@@ -310,12 +253,12 @@ function setGauge(pct) {
   c.style.stroke = pct > 70 ? '#1D9E75' : pct > 40 ? '#c86000' : '#E24B4A';
 }
 
-// ─── LOAD LATEST DATA ────────────────────────────────────
 async function loadLatest() {
   const flux = `
 from(bucket: "${BUCKET}")
   |> range(start: -1h)
-  |> filter(fn: (r) => r._measurement == "serre" and r.location == "fes")
+  |> filter(fn: (r) => r._measurement == "serre")
+  |> filter(fn: (r) => r._field == "temperature" or r._field == "humidity" or r._field == "soil_moisture" or r._field == "lux" or r._field == "air_ppm")
   |> last()
   |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
 `;
@@ -325,34 +268,31 @@ from(bucket: "${BUCKET}")
     if (!rows.length) return false;
 
     const last = rows[rows.length - 1];
-    const temp  = parseFloat(last.temperature);
-    const hum   = parseFloat(last.humidity);
-    const soil  = parseFloat(last.soil_moisture);
-    const lux   = parseFloat(last.lux);
-    const air   = parseFloat(last.air_ppm);
-    const ts    = last._time ? new Date(last._time).toLocaleString('fr-MA', {
+    const temp = parseFloat(last.temperature);
+    const hum  = parseFloat(last.humidity);
+    const soil = parseFloat(last.soil_moisture);
+    const lux  = parseFloat(last.lux);
+    const air  = parseFloat(last.air_ppm);
+    const ts   = last._time ? new Date(last._time).toLocaleString('fr-MA', {
       timeZone:'Africa/Casablanca', hour:'2-digit', minute:'2-digit',
       day:'2-digit', month:'2-digit'
     }) : '--';
 
-    setVal('v-temp',  isNaN(temp) ? '--' : temp.toFixed(1) + ' °C');
-    setVal('v-hum',   isNaN(hum)  ? '--' : hum.toFixed(1)  + ' %');
-    setVal('v-hum-gauge', isNaN(hum) ? '--' : hum.toFixed(1) + '%');
-    setVal('v-soil',  isNaN(soil) ? '--' : soil.toFixed(0) + ' %');
-    setVal('v-lux',   isNaN(lux)  ? '--' : lux.toFixed(0)  + ' %');
-    setVal('v-air',   isNaN(air)  ? '--' : Math.round(air) + ' ppm');
-
-    setVal('r-temp',  isNaN(temp) ? '--' : temp.toFixed(1) + ' °C');
-    setVal('r-hum',   isNaN(hum)  ? '--' : hum.toFixed(1)  + ' %');
-    setVal('r-soil',  isNaN(soil) ? '--' : soil.toFixed(0) + ' %');
-    setVal('r-lux',   isNaN(lux)  ? '--' : lux.toFixed(0)  + ' %');
-    setVal('r-air',   isNaN(air)  ? '--' : Math.round(air) + ' ppm');
+    setVal('v-temp',     isNaN(temp) ? '--' : temp.toFixed(1) + ' °C');
+    setVal('v-hum',      isNaN(hum)  ? '--' : hum.toFixed(1)  + ' %');
+    setVal('v-hum-gauge',isNaN(hum)  ? '--' : hum.toFixed(1)  + '%');
+    setVal('v-soil',     isNaN(soil) ? '--' : soil.toFixed(0) + ' %');
+    setVal('v-lux',      isNaN(lux)  ? '--' : lux.toFixed(0)  + ' %');
+    setVal('v-air',      isNaN(air)  ? '--' : Math.round(air) + ' ppm');
+    setVal('r-temp',     isNaN(temp) ? '--' : temp.toFixed(1) + ' °C');
+    setVal('r-hum',      isNaN(hum)  ? '--' : hum.toFixed(1)  + ' %');
+    setVal('r-soil',     isNaN(soil) ? '--' : soil.toFixed(0) + ' %');
+    setVal('r-lux',      isNaN(lux)  ? '--' : lux.toFixed(0)  + ' %');
+    setVal('r-air',      isNaN(air)  ? '--' : Math.round(air) + ' ppm');
 
     if (!isNaN(hum)) setGauge(hum);
-
     document.getElementById('last-ts').textContent = 'Dernière entrée: ' + ts;
     document.getElementById('ts-top').textContent = ts;
-
     return true;
   } catch(e) {
     console.error('loadLatest error:', e);
@@ -360,12 +300,12 @@ from(bucket: "${BUCKET}")
   }
 }
 
-// ─── LOAD HISTORY FOR CHARTS ─────────────────────────────
 async function loadHistory() {
   const flux = `
 from(bucket: "${BUCKET}")
   |> range(start: -1h)
-  |> filter(fn: (r) => r._measurement == "serre" and r.location == "fes")
+  |> filter(fn: (r) => r._measurement == "serre")
+  |> filter(fn: (r) => r._field == "temperature" or r._field == "humidity" or r._field == "soil_moisture" or r._field == "lux" or r._field == "air_ppm")
   |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)
   |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
   |> sort(columns: ["_time"])
@@ -374,24 +314,21 @@ from(bucket: "${BUCKET}")
   return parseCSV(csv);
 }
 
-// ─── BUILD CHART ─────────────────────────────────────────
 function buildChart(id, labels, data, label, color, yLabel) {
   if (charts[id]) charts[id].destroy();
   charts[id] = new Chart(document.getElementById(id), {
     type: 'line',
     data: { labels, datasets: [{
-      label, data,
-      borderColor: color,
+      label, data, borderColor: color,
       backgroundColor: color + '22',
-      fill: true, tension: 0.4,
-      pointRadius: 2, borderWidth: 2, spanGaps: true
+      fill: true, tension: 0.4, pointRadius: 2, borderWidth: 2, spanGaps: true
     }]},
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: { ticks: { font:{size:10}, maxRotation:45, autoSkip:true, maxTicksLimit:12 }, grid:{display:false} },
-        y: { title: { display: true, text: yLabel, font:{size:10} }, ticks:{font:{size:10}}, grid:{color:'rgba(0,0,0,0.05)'} }
+        x: { ticks:{font:{size:10},maxRotation:45,autoSkip:true,maxTicksLimit:12}, grid:{display:false} },
+        y: { title:{display:true,text:yLabel,font:{size:10}}, ticks:{font:{size:10}}, grid:{color:'rgba(0,0,0,0.05)'} }
       }
     }
   });
@@ -403,19 +340,18 @@ function buildAllChart(rows) {
     const d = new Date(r._time);
     return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
   });
-  const datasets = [
-    { label:'Temp (°C)',  data: rows.map(r=>parseFloat(r.temperature)||null),  borderColor:'#E24B4A', backgroundColor:'transparent', tension:.4, pointRadius:0, borderWidth:2, spanGaps:true },
-    { label:'Hum (%)',    data: rows.map(r=>parseFloat(r.humidity)||null),      borderColor:'#185FA5', backgroundColor:'transparent', tension:.4, pointRadius:0, borderWidth:2, spanGaps:true },
-    { label:'Sol (%)',    data: rows.map(r=>parseFloat(r.soil_moisture)||null), borderColor:'#3B6D11', backgroundColor:'transparent', tension:.4, pointRadius:0, borderWidth:2, spanGaps:true },
-    { label:'Lux (%)',    data: rows.map(r=>parseFloat(r.lux)||null),           borderColor:'#BA7517', backgroundColor:'transparent', tension:.4, pointRadius:0, borderWidth:2, spanGaps:true },
-  ];
   if (charts['chart-all']) charts['chart-all'].destroy();
   charts['chart-all'] = new Chart(document.getElementById('chart-all'), {
     type: 'line',
-    data: { labels, datasets },
+    data: { labels, datasets: [
+      { label:'Temp (°C)', data:rows.map(r=>parseFloat(r.temperature)||null), borderColor:'#E24B4A', backgroundColor:'transparent', tension:.4, pointRadius:0, borderWidth:2, spanGaps:true },
+      { label:'Hum (%)',   data:rows.map(r=>parseFloat(r.humidity)||null),    borderColor:'#185FA5', backgroundColor:'transparent', tension:.4, pointRadius:0, borderWidth:2, spanGaps:true },
+      { label:'Sol (%)',   data:rows.map(r=>parseFloat(r.soil_moisture)||null),borderColor:'#3B6D11', backgroundColor:'transparent', tension:.4, pointRadius:0, borderWidth:2, spanGaps:true },
+      { label:'Lux (%)',   data:rows.map(r=>parseFloat(r.lux)||null),         borderColor:'#BA7517', backgroundColor:'transparent', tension:.4, pointRadius:0, borderWidth:2, spanGaps:true },
+    ]},
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: true, position:'bottom', labels:{font:{size:11},boxWidth:12} } },
+      plugins: { legend:{display:true,position:'bottom',labels:{font:{size:11},boxWidth:12}} },
       scales: {
         x: { ticks:{font:{size:10},maxRotation:45,autoSkip:true,maxTicksLimit:15}, grid:{display:false} },
         y: { ticks:{font:{size:10}}, grid:{color:'rgba(0,0,0,0.05)'} }
@@ -432,22 +368,18 @@ async function loadCharts() {
       const d = new Date(r._time);
       return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
     });
-    buildChart('chart-temp', labels, rows.map(r=>parseFloat(r.temperature)||null), 'Température °C', '#E24B4A', '°C');
-    buildChart('chart-hum',  labels, rows.map(r=>parseFloat(r.humidity)||null),    'Humidité %',     '#185FA5', '%');
-    buildChart('chart-air',  labels, rows.map(r=>parseFloat(r.air_ppm)||null),     'PPM',            '#534AB7', 'ppm');
-    buildChart('chart-soil', labels, rows.map(r=>parseFloat(r.soil_moisture)||null),'Sol %',         '#3B6D11', '%');
-    buildChart('chart-lux',  labels, rows.map(r=>parseFloat(r.lux)||null),         'Lux %',          '#BA7517', '%');
+    buildChart('chart-temp', labels, rows.map(r=>parseFloat(r.temperature)||null), 'Température', '#E24B4A', '°C');
+    buildChart('chart-hum',  labels, rows.map(r=>parseFloat(r.humidity)||null),    'Humidité',    '#185FA5', '%');
+    buildChart('chart-air',  labels, rows.map(r=>parseFloat(r.air_ppm)||null),     'PPM',         '#534AB7', 'ppm');
+    buildChart('chart-soil', labels, rows.map(r=>parseFloat(r.soil_moisture)||null),'Sol',        '#3B6D11', '%');
+    buildChart('chart-lux',  labels, rows.map(r=>parseFloat(r.lux)||null),         'Lux',         '#BA7517', '%');
     buildAllChart(rows);
-  } catch(e) {
-    console.error('loadCharts error:', e);
-  }
+  } catch(e) { console.error('loadCharts error:', e); }
 }
 
-// ─── MAIN LOAD ───────────────────────────────────────────
 async function loadAll() {
   document.getElementById('sdot').className = 'sdot';
   document.getElementById('stxt').textContent = 'Connexion…';
-
   try {
     const ok = await loadLatest();
     if (ok) {
@@ -461,11 +393,9 @@ async function loadAll() {
     document.getElementById('sdot').className = 'sdot err';
     document.getElementById('stxt').textContent = 'Hors ligne';
     document.getElementById('status-circle').className = 'status-circle';
-    console.error(e);
   }
 }
 
-// ─── START ───────────────────────────────────────────────
 loadAll();
 setInterval(loadAll, 15000);
 </script>
