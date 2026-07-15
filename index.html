@@ -227,7 +227,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
 <div class="view" id="view-charts">
   <div class="chart-grid">
     <div class="chart-card full">
-      <div class="chart-title">🌡️ TEMPÉRATURE AIR — Dernière heure</div>
+      <div class="chart-title">🌡️ TEMPÉRATURE AIR — 24 dernières heures</div>
       <div style="position:relative;height:220px"><canvas id="chart-temp" role="img" aria-label="Température"></canvas></div>
     </div>
     <div class="chart-card">
@@ -251,7 +251,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
 
 <div class="view" id="view-history">
   <div class="chart-card" style="background:#fff;border-radius:10px;border:1px solid #c8e0c4;padding:16px">
-    <div class="chart-title">📊 TOUTES LES MESURES — Vue combinée dernière heure</div>
+    <div class="chart-title">📊 TOUTES LES MESURES — Vue combinée 24 dernières heures</div>
     <div style="position:relative;height:380px"><canvas id="chart-all" role="img" aria-label="Historique"></canvas></div>
   </div>
 </div>
@@ -372,7 +372,7 @@ function setGauge(pct) {
 async function loadLatest() {
   const flux = `
 from(bucket: "${BUCKET}")
-  |> range(start: -24h)
+  |> range(start: -1h)
   |> filter(fn: (r) => r._measurement == "serre")
   |> filter(fn: (r) => r._field == "temperature" or r._field == "humidity" or r._field == "soil_moisture" or r._field == "lux" or r._field == "air_ppm")
   |> last()
@@ -422,7 +422,7 @@ from(bucket: "${BUCKET}")
   |> range(start: -24h)
   |> filter(fn: (r) => r._measurement == "serre")
   |> filter(fn: (r) => r._field == "temperature" or r._field == "humidity" or r._field == "soil_moisture" or r._field == "lux" or r._field == "air_ppm")
-  |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)
+  |> aggregateWindow(every: 10m, fn: mean, createEmpty: false)
   |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
   |> sort(columns: ["_time"])
 `;
