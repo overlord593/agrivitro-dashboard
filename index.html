@@ -8,6 +8,67 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh;overflow-x:hidden}
+
+/* ---------- LOGIN GATE ---------- */
+#login-gate{
+  position:fixed;inset:0;z-index:1000;
+  background:linear-gradient(135deg,#1a3a1a,#0e220e);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+.login-card{
+  background:#e8f0e4;border-radius:14px;border:2px solid #2a8a2a;
+  padding:36px 32px;width:100%;max-width:360px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.4);
+  text-align:center;
+}
+.login-logo{
+  width:56px;height:56px;background:#1D9E75;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:30px;
+  margin:0 auto 14px;
+}
+.login-title{font-size:17px;font-weight:800;color:#1a3a1a;letter-spacing:.03em}
+.login-sub{font-size:11px;color:#3a7a3a;margin-top:3px;margin-bottom:22px}
+.login-input{
+  width:100%;padding:11px 14px;border-radius:7px;border:2px solid #2a8a2a;
+  background:#fff;font-size:14px;color:#1a1a00;outline:none;margin-bottom:12px;
+  transition:border-color .2s;
+}
+.login-input:focus{border-color:#1D9E75}
+.login-btn{
+  width:100%;padding:11px;border-radius:7px;border:none;
+  background:#1D9E75;color:#fff;font-size:14px;font-weight:700;
+  cursor:pointer;letter-spacing:.04em;transition:background .2s;
+}
+.login-btn:hover{background:#178a63}
+.login-error{
+  font-size:12px;color:#c0392b;margin-top:10px;min-height:16px;
+  font-weight:600;
+}
+.login-footer{font-size:9px;color:#888;margin-top:20px;letter-spacing:.05em}
+#app-content{display:none}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN GATE ================= -->
+<div id="login-gate">
+  <div class="login-card">
+    <div class="login-logo">🌱</div>
+    <div class="login-title">AGRIVITRO BOX</div>
+    <div class="login-sub">Accès sécurisé · Serre Connectée Fès</div>
+    <form id="login-form" autocomplete="off">
+      <input type="password" id="login-pass" class="login-input" placeholder="Mot de passe" required>
+      <button type="submit" class="login-btn">🔒 Accéder à la plateforme</button>
+      <div class="login-error" id="login-error"></div>
+    </form>
+    <div class="login-footer">AGRIVITRO — Cultivez Plus, Dépensez Moins</div>
+  </div>
+</div>
+
+<!-- ================= APP CONTENT ================= -->
+<div id="app-content">
+<style>
 .topbar{background:#1a3a1a;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px;position:sticky;top:0;z-index:100}
 .topbar-left{display:flex;align-items:center;gap:12px}
 .topbar-logo{width:32px;height:32px;background:#1D9E75;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px}
@@ -19,6 +80,8 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
 .sdot.err{background:#E24B4A}
 .rfbtn{background:#2a5a2a;color:#aaffaa;border:1px solid #3a7a3a;border-radius:5px;padding:4px 12px;cursor:pointer;font-size:12px}
 .rfbtn:hover{background:#3a7a3a}
+.logout-btn{background:#5a2a2a;color:#ffaaaa;border:1px solid #7a3a3a;border-radius:5px;padding:4px 12px;cursor:pointer;font-size:12px}
+.logout-btn:hover{background:#7a3a3a}
 .tabs{display:flex;background:#142814;border-bottom:2px solid #2a8a2a}
 .tab{padding:10px 24px;font-size:12px;font-weight:600;color:#7fbf7f;cursor:pointer;border-bottom:3px solid transparent;letter-spacing:.06em}
 .tab.act{color:#fff;border-bottom-color:#1D9E75;background:#1a3a1a}
@@ -61,8 +124,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .pulsing{animation:pulse 1.2s infinite}
 </style>
-</head>
-<body>
 
 <div class="topbar">
   <div class="topbar-left">
@@ -76,6 +137,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
     <span><span class="sdot" id="sdot"></span><span id="stxt">Connexion…</span></span>
     <span id="ts-top" style="color:#7fbf7f;font-size:11px"></span>
     <button class="rfbtn" onclick="loadAll()">↺ Rafraîchir</button>
+    <button class="logout-btn" onclick="logout()">⎋ Déconnexion</button>
   </div>
 </div>
 
@@ -194,7 +256,61 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
   </div>
 </div>
 
+</div><!-- /app-content -->
+
 <script>
+/* =====================================================
+   AUTHENTIFICATION (protection côté client)
+   Le mot de passe n'est jamais stocké en clair : on compare
+   son hash SHA-256 à une empreinte pré-calculée.
+   Session valable tant que l'onglet du navigateur reste ouvert
+   (sessionStorage) — redemandé à la fermeture du navigateur.
+   ===================================================== */
+const PASS_HASH = '60eb0d044d04f931ed81f9ece9b9488aedeeca00b9c0d8f6e638d2c4f3a67694';
+const AUTH_KEY  = 'agrivitro_auth_ok';
+
+async function sha256(text) {
+  const enc = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function showApp() {
+  document.getElementById('login-gate').style.display = 'none';
+  document.getElementById('app-content').style.display = 'block';
+  loadAll();
+  setInterval(loadAll, 15000);
+}
+
+function logout() {
+  sessionStorage.removeItem(AUTH_KEY);
+  location.reload();
+}
+
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const input = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  const hash = await sha256(input);
+  if (hash === PASS_HASH) {
+    sessionStorage.setItem(AUTH_KEY, '1');
+    errEl.textContent = '';
+    showApp();
+  } else {
+    errEl.textContent = 'Mot de passe incorrect. Réessayez.';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-pass').focus();
+  }
+});
+
+// Si déjà authentifié dans cette session, sauter directement au dashboard
+if (sessionStorage.getItem(AUTH_KEY) === '1') {
+  showApp();
+}
+
+/* =====================================================
+   DASHBOARD (inchangé)
+   ===================================================== */
 const INFLUX_URL   = 'https://us-east-1-1.aws.cloud2.influxdata.com';
 const INFLUX_TOKEN = '2-qw3pUFmgsWIUFEu5qd02PoGszAK-dz8qrzrESvrQ6QFrtsBbkcfcCY5wAZXyblCkYszFzQB9jV2XfQhZf-PA==';
 const INFLUX_ORG   = 'c24b7db57e26733b';
@@ -395,9 +511,6 @@ async function loadAll() {
     document.getElementById('status-circle').className = 'status-circle';
   }
 }
-
-loadAll();
-setInterval(loadAll, 15000);
 </script>
 </body>
 </html>
