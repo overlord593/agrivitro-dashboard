@@ -372,7 +372,7 @@ function setGauge(pct) {
 async function loadLatest() {
   const flux = `
 from(bucket: "${BUCKET}")
-  |> range(start: -1h)
+  |> range(start: -24h)
   |> filter(fn: (r) => r._measurement == "serre")
   |> filter(fn: (r) => r._field == "temperature" or r._field == "humidity" or r._field == "soil_moisture" or r._field == "lux" or r._field == "air_ppm")
   |> last()
@@ -419,7 +419,7 @@ from(bucket: "${BUCKET}")
 async function loadHistory() {
   const flux = `
 from(bucket: "${BUCKET}")
-  |> range(start: -1h)
+  |> range(start: -24h)
   |> filter(fn: (r) => r._measurement == "serre")
   |> filter(fn: (r) => r._field == "temperature" or r._field == "humidity" or r._field == "soil_moisture" or r._field == "lux" or r._field == "air_ppm")
   |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)
