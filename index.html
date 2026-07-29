@@ -317,7 +317,13 @@ const INFLUX_ORG   = 'c24b7db57e26733b';
 const BUCKET       = 'agrivitro-serre';
 let charts = {};
 let lastHistoryRows = [];
-
+  
+function sanitizePpm(val) {
+  const v = parseFloat(val);
+  if (isNaN(v) || v < 0 || v > 3000) return null; // valeur aberrante -> ignorée
+  return v;
+}
+  
 function switchTab(name, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('act'));
   document.querySelectorAll('.view').forEach(v => v.classList.remove('act'));
