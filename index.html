@@ -110,6 +110,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
 .fan-mode-tag.manual{background:#c86000;color:#fff}
 .fan-mode-tag.auto{background:#2a8a2a;color:#fff}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.icon-pulse{animation:pulse 1s infinite}
 .fan-ctrl-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 .fan-btn{flex:1;min-width:0;font-size:10px;font-weight:700;letter-spacing:.03em;padding:6px 4px;border-radius:5px;border:1px solid;cursor:pointer;background:#e8f4e4;color:#1a5a1a;transition:filter .15s}
 .fan-btn:hover{filter:brightness(0.95)}
@@ -194,6 +195,13 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
             <div class="fan-lbl">Ventilateur</div>
           </div>
         </div>
+        <div class="fan-badge">
+          <span class="fan-icon" id="v-pump-icon">🚿</span>
+          <div>
+            <div class="fan-val" id="v-pump"><span id="v-pump-txt">--</span><span class="fan-mode-tag" id="v-pump-mode" style="display:none"></span></div>
+            <div class="fan-lbl">Pompe irrigation</div>
+          </div>
+        </div>
       </div>
       <div class="bancale offline">
         <span class="bancale-label">SOUSS-MASSA #1</span>
@@ -220,6 +228,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
           <tr><td>☀️ Lumière</td><td id="r-lux">--</td></tr>
           <tr><td>🌬️ Air PPM</td><td id="r-air">--</td></tr>
           <tr><td>🌀 Ventilateur</td><td id="r-fan">--</td></tr>
+          <tr><td>🚿 Pompe irrigation</td><td id="r-pump">--</td></tr>
         </table>
       </div>
       <div class="panel-box">
@@ -232,6 +241,17 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#e8f0e4;min-height:100vh
           <button class="fan-btn btn-auto" id="fan-btn-auto" onclick="sendFanCommand('auto')">↺ Retour Auto</button>
         </div>
         <div class="fan-cmd-fb" id="fan-cmd-fb"></div>
+      </div>
+      <div class="panel-box">
+        <div class="panel-title">🚿 CONTRÔLE POMPE</div>
+        <div class="fan-ctrl-row">
+          <button class="fan-btn btn-on" id="pump-btn-on" onclick="sendPumpCommand('on')">MARCHE</button>
+          <button class="fan-btn btn-off" id="pump-btn-off" onclick="sendPumpCommand('off')">ARRÊT</button>
+        </div>
+        <div class="fan-ctrl-row">
+          <button class="fan-btn btn-auto" id="pump-btn-auto" onclick="sendPumpCommand('auto')">↺ Retour Auto</button>
+        </div>
+        <div class="fan-cmd-fb" id="pump-cmd-fb"></div>
       </div>
       <div class="panel-box">
         <div class="panel-title">ESPACE TECHNIQUE</div>
@@ -396,42 +416,48 @@ function setGauge(pct) {
   c.style.stroke = pct > 70 ? '#1D9E75' : pct > 40 ? '#c86000' : '#E24B4A';
 }
 /* =====================================================
-   CONTRÔLE VENTILATEUR (manuel)
+   CONTRÔLE ACTIONNEURS (ventilateur + pompe, manuel)
    Écrit une commande directement dans InfluxDB (mesure "commands",
-   champ "fan_cmd" : 1=ON, 0=OFF, 2=retour AUTO). Le récepteur LoRa
-   relit ce point périodiquement et le transmet au nœud dès que
-   celui-ci est à l'écoute — un délai de quelques secondes est donc
-   normal, ce n'est pas instantané comme un interrupteur local.
+   champ "fan_cmd" ou "pump_cmd" : 1=ON, 0=OFF, 2=retour AUTO). Le
+   récepteur LoRa relit ces points périodiquement et les transmet au
+   nœud dès que celui-ci est à l'écoute — un délai de quelques
+   secondes est donc normal, ce n'est pas instantané comme un
+   interrupteur local.
    ===================================================== */
-let fanCmdBusy = false;
-function updateFanButtons(fanKnown, fanOn, fanIsManual) {
-  const btnOn   = document.getElementById('fan-btn-on');
-  const btnOff  = document.getElementById('fan-btn-off');
-  const btnAuto = document.getElementById('fan-btn-auto');
-  if (!btnOn || !btnOff || !btnAuto) return;
-  if (fanCmdBusy) return; // ne pas ré-activer pendant l'envoi d'une commande
-  btnOn.disabled   = fanKnown && fanIsManual && fanOn;
-  btnOff.disabled  = fanKnown && fanIsManual && !fanOn;
-  btnAuto.disabled = fanKnown && !fanIsManual;
+const actuatorCmdBusy = { fan: false, pump: false };
+function actuatorButtonIds(kind) {
+  return [kind + '-btn-on', kind + '-btn-off', kind + '-btn-auto'];
 }
-function fanCmdFeedback(msg, isErr) {
-  const fb = document.getElementById('fan-cmd-fb');
+function updateActuatorButtons(kind, known, on, isManual) {
+  if (actuatorCmdBusy[kind]) return; // ne pas ré-activer pendant l'envoi d'une commande
+  const [onId, offId, autoId] = actuatorButtonIds(kind);
+  const btnOn   = document.getElementById(onId);
+  const btnOff  = document.getElementById(offId);
+  const btnAuto = document.getElementById(autoId);
+  if (!btnOn || !btnOff || !btnAuto) return;
+  btnOn.disabled   = known && isManual && on;
+  btnOff.disabled  = known && isManual && !on;
+  btnAuto.disabled = known && !isManual;
+}
+function actuatorCmdFeedback(kind, msg, isErr) {
+  const fb = document.getElementById(kind + '-cmd-fb');
   if (!fb) return;
   fb.textContent = msg;
   fb.classList.toggle('err', !!isErr);
 }
-async function sendFanCommand(action) {
-  if (fanCmdBusy) return;
-  const fanCmd = action === 'on' ? 1 : (action === 'off' ? 0 : 2);
-  const label  = action === 'on' ? 'MARCHE' : (action === 'off' ? 'ARRÊT' : 'AUTO');
-  fanCmdBusy = true;
-  ['fan-btn-on','fan-btn-off','fan-btn-auto'].forEach(id => {
+async function sendActuatorCommand(kind, action) {
+  if (actuatorCmdBusy[kind]) return;
+  const field = kind === 'fan' ? 'fan_cmd' : 'pump_cmd';
+  const val   = action === 'on' ? 1 : (action === 'off' ? 0 : 2);
+  const label = action === 'on' ? 'MARCHE' : (action === 'off' ? 'ARRÊT' : 'AUTO');
+  actuatorCmdBusy[kind] = true;
+  actuatorButtonIds(kind).forEach(id => {
     const b = document.getElementById(id);
     if (b) b.disabled = true;
   });
-  fanCmdFeedback('Envoi de la commande ' + label + '…', false);
+  actuatorCmdFeedback(kind, 'Envoi de la commande ' + label + '…', false);
   try {
-    const payload = `commands,location=fes fan_cmd=${fanCmd}i`;
+    const payload = `commands,location=fes ${field}=${val}i`;
     const url = `${INFLUX_URL}/api/v2/write?org=${INFLUX_ORG}&bucket=${BUCKET}&precision=s`;
     const resp = await fetch(url, {
       method: 'POST',
@@ -442,23 +468,55 @@ async function sendFanCommand(action) {
       body: payload
     });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    fanCmdFeedback('Commande ' + label + ' envoyée — le nœud l\'appliquera sous quelques secondes.', false);
+    actuatorCmdFeedback(kind, 'Commande ' + label + ' envoyée — le nœud l\'appliquera sous quelques secondes.', false);
   } catch (e) {
-    console.error('sendFanCommand error:', e);
-    fanCmdFeedback('Erreur d\'envoi de la commande.', true);
+    console.error('sendActuatorCommand error:', e);
+    actuatorCmdFeedback(kind, 'Erreur d\'envoi de la commande.', true);
   } finally {
-    fanCmdBusy = false;
+    actuatorCmdBusy[kind] = false;
     // Laisse loadLatest() (rafraîchi toutes les 15s) remettre les
     // boutons dans le bon état une fois le nouvel état confirmé.
     setTimeout(() => { loadLatest(); }, 4000);
   }
+}
+function sendFanCommand(action)  { sendActuatorCommand('fan', action); }
+function sendPumpCommand(action) { sendActuatorCommand('pump', action); }
+// Updates the badge (icon + text + mode tag) and summary-table row
+// for one actuator; shared by both fan and pump since their markup
+// follows the same id convention (v-<kind>, v-<kind>-txt, etc).
+function updateActuatorDisplay(kind, statusVal, manualVal, spinClass) {
+  const known  = !isNaN(statusVal) && (statusVal === 0 || statusVal === 1);
+  const on     = known && statusVal === 1;
+  const manual = known && manualVal === 1;
+  const txt    = known ? (on ? 'MARCHE' : 'ARRÊT') : '--';
+
+  setVal('r-' + kind, txt + (known ? (manual ? ' (Manuel)' : ' (Auto)') : ''));
+
+  const txtEl   = document.getElementById('v-' + kind + '-txt');
+  if (txtEl) txtEl.textContent = txt;
+  const badgeEl = document.getElementById('v-' + kind);
+  const icoEl   = document.getElementById('v-' + kind + '-icon');
+  const modeTag = document.getElementById('v-' + kind + '-mode');
+  if (badgeEl) { badgeEl.classList.remove('pulsing'); badgeEl.classList.toggle('on', on); badgeEl.classList.toggle('off', known && !on); }
+  if (icoEl)   icoEl.classList.toggle(spinClass, on);
+  if (modeTag) {
+    if (known) {
+      modeTag.style.display = 'inline-block';
+      modeTag.textContent = manual ? 'MANUEL' : 'AUTO';
+      modeTag.classList.toggle('manual', manual);
+      modeTag.classList.toggle('auto', !manual);
+    } else {
+      modeTag.style.display = 'none';
+    }
+  }
+  updateActuatorButtons(kind, known, on, manual);
 }
 async function loadLatest() {
   const flux = `
 from(bucket: "${BUCKET}")
   |> range(start: -1h)
   |> filter(fn: (r) => r._measurement == "serre")
-  |> filter(fn: (r) => r._field == "temperature" or r._field == "humidity" or r._field == "soil_moisture" or r._field == "lux" or r._field == "air_ppm" or r._field == "fan_status" or r._field == "fan_manual")
+  |> filter(fn: (r) => r._field == "temperature" or r._field == "humidity" or r._field == "soil_moisture" or r._field == "lux" or r._field == "air_ppm" or r._field == "fan_status" or r._field == "fan_manual" or r._field == "pump_status" or r._field == "pump_manual")
   |> last()
   |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
 `;
@@ -474,6 +532,8 @@ from(bucket: "${BUCKET}")
     const air  = parseFloat(last.air_ppm);
     const fan  = parseFloat(last.fan_status);
     const fanManual = parseFloat(last.fan_manual);
+    const pump = parseFloat(last.pump_status);
+    const pumpManual = parseFloat(last.pump_manual);
     const ts   = last._time ? new Date(last._time).toLocaleString('fr-MA', {
       timeZone:'Africa/Casablanca', hour:'2-digit', minute:'2-digit',
       day:'2-digit', month:'2-digit'
@@ -489,34 +549,10 @@ from(bucket: "${BUCKET}")
     setVal('r-soil',     isNaN(soil) ? '--' : soil.toFixed(0) + ' %');
     setVal('r-lux',      isNaN(lux)  ? '--' : lux.toFixed(0)  + ' lx');
     setVal('r-air',      isNaN(air)  ? '--' : Math.round(air) + ' ppm');
-    // Fan/relay status (read-only display — reflects what the node
-    // reported, no control from here yet).
-    const fanKnown  = !isNaN(fan) && (fan === 0 || fan === 1);
-    const fanOn     = fanKnown && fan === 1;
-    const fanIsManual = fanKnown && fanManual === 1;
-    const fanTxt    = fanKnown ? (fanOn ? 'MARCHE' : 'ARRÊT') : '--';
-    setVal('r-fan', fanTxt + (fanKnown ? (fanIsManual ? ' (Manuel)' : ' (Auto)') : ''));
-    // v-fan has a nested mode-tag span, so update its text node
-    // directly instead of going through setVal (which would wipe
-    // the child span via textContent).
-    const fanTxtEl = document.getElementById('v-fan-txt');
-    if (fanTxtEl) { fanTxtEl.textContent = fanTxt; }
-    const fanEl  = document.getElementById('v-fan');
-    const fanIco = document.getElementById('v-fan-icon');
-    const fanModeTag = document.getElementById('v-fan-mode');
-    if (fanEl)  { fanEl.classList.remove('pulsing'); fanEl.classList.toggle('on', fanOn); fanEl.classList.toggle('off', fanKnown && !fanOn); }
-    if (fanIco) fanIco.classList.toggle('spin', fanOn);
-    if (fanModeTag) {
-      if (fanKnown) {
-        fanModeTag.style.display = 'inline-block';
-        fanModeTag.textContent = fanIsManual ? 'MANUEL' : 'AUTO';
-        fanModeTag.classList.toggle('manual', fanIsManual);
-        fanModeTag.classList.toggle('auto', !fanIsManual);
-      } else {
-        fanModeTag.style.display = 'none';
-      }
-    }
-    updateFanButtons(fanKnown, fanOn, fanIsManual);
+    // Fan and pump status (badge + summary row + control buttons) —
+    // reflects what the node actually reported, AUTO or MANUEL.
+    updateActuatorDisplay('fan',  fan,  fanManual,  'spin');
+    updateActuatorDisplay('pump', pump, pumpManual, 'icon-pulse');
     if (!isNaN(hum)) setGauge(hum);
     document.getElementById('last-ts').textContent = 'Dernière entrée: ' + ts;
     document.getElementById('ts-top').textContent = ts;
